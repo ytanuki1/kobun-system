@@ -37,7 +37,7 @@
     .container {
       background-color: var(--card-bg);
       width: 100%;
-      max-width: 520px;
+      max-width: 580px;
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
       padding: 24px;
@@ -55,14 +55,15 @@
       color: var(--primary-color);
     }
 
+    /* 設定パネル */
     .setting-group {
       background-color: #f8f9fa;
-      padding: 12px 16px;
-      border-radius: 8px;
+      padding: 16px;
+      border-radius: 12px;
       margin-bottom: 20px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       font-size: 14px;
     }
 
@@ -70,18 +71,48 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 10px;
     }
 
-    select {
-      padding: 6px 12px;
+    .range-inputs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    select, input[type="number"], input[type="text"] {
+      padding: 6px 10px;
       border-radius: 6px;
       border: 1px solid var(--border-color);
       background: white;
       font-size: 14px;
       outline: none;
-      cursor: pointer;
     }
 
+    input[type="number"] {
+      width: 70px;
+      text-align: center;
+    }
+
+    .start-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+
+    .start-btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* クイズカード */
     .card {
       border: 1px solid var(--border-color);
       border-radius: 12px;
@@ -119,7 +150,7 @@
     .word-kanji {
       font-size: 14px;
       color: var(--sub-text);
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
     .example-box {
@@ -187,27 +218,10 @@
       box-shadow: 0 0 0 3px rgba(0,112,243,0.1);
     }
 
-    .submit-btn {
-      width: 100%;
-      padding: 12px;
-      background-color: var(--primary-color);
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .submit-btn:hover {
-      background-color: var(--primary-hover);
-    }
-
-    /* 結果フィードバック */
+    /* フィードバック表示 */
     .feedback-box {
       margin-top: 16px;
-      padding: 12px;
+      padding: 14px;
       border-radius: 8px;
       text-align: center;
       font-weight: bold;
@@ -227,7 +241,7 @@
     }
 
     .explanation-box {
-      margin-top: 10px;
+      margin-top: 8px;
       font-size: 14px;
       color: #333;
       text-align: left;
@@ -252,6 +266,70 @@
       color: var(--sub-text);
       margin-bottom: 8px;
     }
+
+    /* 結果画面 */
+    .result-score {
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+    }
+
+    .result-list {
+      max-height: 320px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    .result-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+    }
+
+    .result-item-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .text-correct { color: var(--correct-color); }
+    .text-incorrect { color: var(--incorrect-color); }
+
+    .btn-group-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .review-btn {
+      background-color: #e65100;
+      color: white;
+    }
+
+    .review-btn:hover {
+      background-color: #b23c00;
+    }
+
+    .secondary-btn {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .secondary-btn:hover {
+      background-color: #5a6268;
+    }
   </style>
 </head>
 <body>
@@ -261,77 +339,107 @@
     <h1>古文単語システムクイズ</h1>
   </header>
 
-  <!-- 設定パネル -->
-  <div class="setting-group">
-    <div class="setting-row">
-      <label for="modeSelect">出題形式:</label>
-      <select id="modeSelect" onchange="resetQuiz()">
-        <option value="meaning-choice">単語の意味（4択）</option>
-        <option value="meaning-write">単語の意味（書き取り）</option>
-        <option value="example-choice">例文訳の穴埋め（4択）</option>
-        <option value="example-write">例文訳の穴埋め（書き取り）</option>
-      </select>
+  <!-- 1. 設定パネル -->
+  <div id="setupScreen">
+    <div class="setting-group">
+      <div class="setting-row">
+        <label>出題範囲:</label>
+        <div class="range-inputs">
+          <input type="number" id="rangeStart" value="1" min="1" max="10">
+          <span>〜</span>
+          <input type="number" id="rangeEnd" value="10" min="1" max="10">
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <label for="questionCount">出題数:</label>
+        <input type="number" id="questionCount" value="10" min="1" max="10">
+      </div>
+
+      <div class="setting-row">
+        <label for="orderSelect">出題順序:</label>
+        <select id="orderSelect">
+          <option value="order">順番通り</option>
+          <option value="random">ランダム</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <label for="modeSelect">出題形式:</label>
+        <select id="modeSelect" onchange="toggleWriteLevelUI()">
+          <option value="meaning-choice">単語の意味（4択）</option>
+          <option value="meaning-write">単語の意味（書き取り）</option>
+          <option value="example-choice">例文訳の穴埋め（4択）</option>
+          <option value="example-write">例文訳の穴埋め（書き取り）</option>
+        </select>
+      </div>
+
+      <div class="setting-row" id="judgeLevelRow" style="display: none;">
+        <label for="levelSelect">書き取り判定基準:</label>
+        <select id="levelSelect">
+          <option value="strict">1. 厳密（完全一致）</option>
+          <option value="standard" selected>2. 標準（部分・揺らぎ許容）</option>
+          <option value="lenient">3. 緩め（単語・主要語含む）</option>
+        </select>
+      </div>
     </div>
 
-    <div class="setting-row" id="judgeLevelRow" style="display: none;">
-      <label for="levelSelect">書き取り判定基準:</label>
-      <select id="levelSelect" onchange="resetQuiz()">
-        <option value="strict">1. 厳密（完全一致）</option>
-        <option value="standard" selected>2. 標準（部分・揺らぎ許容）</option>
-        <option value="lenient">3. 緩め（単語・主要語含む）</option>
-      </select>
+    <button class="start-btn" onclick="startQuiz(false)">テストを開始する</button>
+  </div>
+
+  <!-- 2. クイズ実行画面 -->
+  <div id="quizScreen" style="display: none;">
+    <div class="progress-text" id="progressText">第 1 / 10 問</div>
+
+    <div class="card">
+      <div class="badge-container">
+        <span class="badge" id="wordBadge">No. 1</span>
+        <span class="badge badge-pos" id="posBadge">動・ラ変</span>
+      </div>
+      
+      <div class="word-title" id="wordTitle">あり</div>
+      <div class="word-kanji" id="kanjiTitle">【有り・在り】</div>
+
+      <div class="example-box" id="exampleBox" style="display: none;">
+        <div class="example-text" id="exampleText">昔、男ありけり。</div>
+        <div class="example-trans" id="exampleTrans">昔、男が[ ??? ]。</div>
+      </div>
     </div>
 
-    <div class="setting-row">
-      <label for="orderSelect">出題順序:</label>
-      <select id="orderSelect" onchange="resetQuiz()">
-        <option value="random">ランダム</option>
-        <option value="order">番号順</option>
-      </select>
+    <div id="answerArea">
+      <!-- 4択UI -->
+      <div class="btn-grid" id="choiceContainer"></div>
+
+      <!-- 書き取りUI -->
+      <div class="write-container" id="writeContainer" style="display: none;">
+        <input type="text" id="writeInput" class="write-input" placeholder="解答を入力してください" autocomplete="off">
+        <button class="start-btn" onclick="submitWriteAnswer()">回答する</button>
+      </div>
+    </div>
+
+    <!-- 結果フィードバック -->
+    <div class="feedback-box" id="feedbackBox">
+      <div id="feedbackTitle"></div>
+      <div class="explanation-box" id="explanationText"></div>
+      <button class="next-btn" onclick="nextQuestion()">次の問題へ</button>
     </div>
   </div>
 
-  <div class="progress-text" id="progressText">第 1 / 10 問</div>
-
-  <!-- クイズ本体エリア -->
-  <div class="card">
-    <div class="badge-container">
-      <span class="badge" id="wordBadge">No. 1</span>
-      <span class="badge badge-pos" id="posBadge">動・ラ変</span>
-    </div>
+  <!-- 3. 最終結果画面 -->
+  <div id="resultScreen" style="display: none;">
+    <div class="result-score" id="resultScoreText">10 問中 8 問正解 (80%)</div>
     
-    <div class="word-title" id="wordTitle">あり</div>
-    <div class="word-kanji" id="kanjiTitle">【有り・在り】</div>
+    <div class="result-list" id="resultList"></div>
 
-    <!-- 例文表示枠 -->
-    <div class="example-box" id="exampleBox" style="display: none;">
-      <div class="example-text" id="exampleText">昔、男ありけり。</div>
-      <div class="example-trans" id="exampleTrans">昔、男が[ ??? ]。</div>
+    <div class="btn-group-vertical">
+      <button class="start-btn review-btn" id="reviewBtn" onclick="startQuiz(true)">間違えた問題だけを解き直す</button>
+      <button class="start-btn secondary-btn" onclick="showSetupScreen()">設定に戻る</button>
     </div>
-  </div>
-
-  <!-- 解答UIエリア -->
-  <div id="answerArea">
-    <!-- 4択UI -->
-    <div class="btn-grid" id="choiceContainer"></div>
-
-    <!-- 書き取りUI -->
-    <div class="write-container" id="writeContainer" style="display: none;">
-      <input type="text" id="writeInput" class="write-input" placeholder="解答を入力してください" autocomplete="off">
-      <button class="submit-btn" onclick="submitWriteAnswer()">回答する</button>
-    </div>
-  </div>
-
-  <!-- 結果・解説表示 -->
-  <div class="feedback-box" id="feedbackBox">
-    <div id="feedbackTitle"></div>
-    <div class="explanation-box" id="explanationText"></div>
-    <button class="next-btn" onclick="nextQuestion()">次の問題へ</button>
   </div>
 </div>
 
 <script>
-// 1. 組み込みデータベース（全10問完全保存）
+// データベース（全10問）
 const wordsData = [
   {
     id: 1,
@@ -423,7 +531,7 @@ const wordsData = [
     meanings: ["見える。目に入る。", "現れる。姿を見せる。会う。", "（人に）見られる。（人に）見せる。", "（女性が）結婚する。妻になる。"],
     examples: [
       { text: "月あかるければ、いとよくありさま見ゆ。", translation: "月明かりが明るいので、とてもよく（辺りの）様子が[見える]。", blankTarget: "見える" },
-      { text: "さても、かばかりの車に車入らぬ門やはある。見えば笑ふたむ。", translation: "それにしても、これほどの客の車が入らない門があるか（いやない）。（客の主人が）[現れたら]笑ってやろう。", blankTarget: "現れたら" },
+      { text: "さても、かばかりの車に車入らぬ門やはある。見えば笑ふたむ。", translation: "手にしても、これほどの客の車が入らない門があるか（いやない）。（客の主人が）[現れたら]笑ってやろう。", blankTarget: "現れたら" },
       { text: "ただ、人に見えんぞねたき。", translation: "ただ、（この冊子が）人に[見られた]ようなことがしゃくにさわる。", blankTarget: "見られた" }
     ]
   },
@@ -452,27 +560,54 @@ const wordsData = [
   }
 ];
 
-// アプリ全体の状態管理
+// アプリ状態
 let currentQuestions = [];
 let currentIndex = 0;
+let quizHistory = [];
+let lastWrongWordIds = [];
 
-// 初期化処理
-function resetQuiz() {
+function toggleWriteLevelUI() {
+  const mode = document.getElementById('modeSelect').value;
+  document.getElementById('judgeLevelRow').style.display = mode.endsWith('-write') ? 'flex' : 'none';
+}
+
+function showSetupScreen() {
+  document.getElementById('setupScreen').style.display = 'block';
+  document.getElementById('quizScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'none';
+}
+
+// テスト開始・復習開始
+function startQuiz(isReview = false) {
   const mode = document.getElementById('modeSelect').value;
   const order = document.getElementById('orderSelect').value;
-  
-  // 書き取り判定レベル設定の表示制御
   const isWriteMode = mode.endsWith('-write');
-  document.getElementById('judgeLevelRow').style.display = isWriteMode ? 'flex' : 'none';
 
-  // UI切り替え
-  document.getElementById('choiceContainer').style.display = isWriteMode ? 'none' : 'flex';
-  document.getElementById('writeContainer').style.display = isWriteMode ? 'flex' : 'none';
-  document.getElementById('feedbackBox').style.display = 'none';
-  document.getElementById('writeInput').value = '';
+  let targetWords = [];
 
-  // 問題セット作成
-  currentQuestions = wordsData.map(w => {
+  if (isReview) {
+    // 間違えた単語のみから復習
+    targetWords = wordsData.filter(w => lastWrongWordIds.includes(w.id));
+  } else {
+    // 設定範囲から抽出
+    const start = parseInt(document.getElementById('rangeStart').value) || 1;
+    const end = parseInt(document.getElementById('rangeEnd').value) || 10;
+    const count = parseInt(document.getElementById('questionCount').value) || 10;
+
+    let filtered = wordsData.filter(w => w.id >= start && w.id <= end);
+    if (order === 'random') {
+      filtered.sort(() => Math.random() - 0.5);
+    }
+    targetWords = filtered.slice(0, count);
+  }
+
+  if (targetWords.length === 0) {
+    alert("対象となる単語が見つかりませんでした。範囲や条件を確認してください。");
+    return;
+  }
+
+  // 問題構造生成
+  currentQuestions = targetWords.map(w => {
     if (mode.startsWith('example')) {
       const randomEx = w.examples[Math.floor(Math.random() * w.examples.length)];
       return {
@@ -499,36 +634,39 @@ function resetQuiz() {
     }
   });
 
-  // 順序の切り替え
-  if (order === 'random') {
+  if (isReview && order === 'random') {
     currentQuestions.sort(() => Math.random() - 0.5);
   }
 
   currentIndex = 0;
+  quizHistory = [];
+
+  // UI切り替え
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('quizScreen').style.display = 'block';
+
+  document.getElementById('choiceContainer').style.display = isWriteMode ? 'none' : 'flex';
+  document.getElementById('writeContainer').style.display = isWriteMode ? 'flex' : 'none';
+
   showQuestion();
 }
 
-// 問題の表示
 function showQuestion() {
   if (currentIndex >= currentQuestions.length) {
-    alert("全問が終了しました！最初に戻ります。");
-    resetQuiz();
+    showResults();
     return;
   }
 
   const q = currentQuestions[currentIndex];
   const mode = document.getElementById('modeSelect').value;
 
-  // 進捗状況
   document.getElementById('progressText').innerText = `第 ${currentIndex + 1} / ${currentQuestions.length} 問`;
-
-  // ヘッダー情報
   document.getElementById('wordBadge').innerText = `No. ${q.id}`;
   document.getElementById('posBadge').innerText = q.pos;
   document.getElementById('wordTitle').innerText = q.word;
   document.getElementById('kanjiTitle').innerText = `【${q.kanji}】`;
 
-  // 例文表示コントロール
   const exampleBox = document.getElementById('exampleBox');
   if (q.isExample) {
     exampleBox.style.display = 'block';
@@ -538,10 +676,8 @@ function showQuestion() {
     exampleBox.style.display = 'none';
   }
 
-  // フィードバック非表示
   document.getElementById('feedbackBox').style.display = 'none';
 
-  // 回答形式に応じた表示
   if (mode.endsWith('-choice')) {
     generateChoices(q);
   } else {
@@ -552,51 +688,39 @@ function showQuestion() {
   }
 }
 
-// 4択選択肢の生成
 function generateChoices(q) {
   const container = document.getElementById('choiceContainer');
   container.innerHTML = '';
 
   let choices = [q.correctAnswer];
-  
-  // ダミー選択肢を抽出
   while (choices.length < 4) {
     const randomWord = wordsData[Math.floor(Math.random() * wordsData.length)];
     let dummy = q.isExample ? randomWord.examples[0].blankTarget : randomWord.meanings[0];
-    if (!choices.includes(dummy)) {
-      choices.push(dummy);
-    }
+    if (!choices.includes(dummy)) choices.push(dummy);
   }
-
-  // ランダムに並び替え
   choices.sort(() => Math.random() - 0.5);
 
   choices.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'option-btn';
     btn.innerText = opt;
-    btn.onclick = () => checkAnswer(opt === q.correctAnswer, q.correctAnswer);
+    btn.onclick = () => checkAnswer(opt === q.correctAnswer, opt);
     container.appendChild(btn);
   });
 }
 
-// 書き取り回答の提出
 function submitWriteAnswer() {
   const userInput = document.getElementById('writeInput').value.trim();
   if (!userInput) return;
 
   const q = currentQuestions[currentIndex];
   const level = document.getElementById('levelSelect').value;
-  
   const isCorrect = validateWritingAnswer(userInput, q, level);
-  checkAnswer(isCorrect, q.correctAnswer, userInput);
+  checkAnswer(isCorrect, userInput);
 }
 
-// 書き取りの正誤判定（3段階レベル）
 function validateWritingAnswer(userInput, q, level) {
-  // 正規化処理（空白・記号除去）
   const normalize = (str) => str.replace(/[\s、。・！!？?「」『』（）()\n\t-]/g, '').toLowerCase();
-  
   const normUser = normalize(userInput);
   const targetList = q.isExample ? [q.correctAnswer] : q.allMeanings;
 
@@ -604,22 +728,12 @@ function validateWritingAnswer(userInput, q, level) {
 
   for (let target of targetList) {
     const normTarget = normalize(target);
-
-    // 1. 厳密（完全一致）
     if (level === 'strict') {
       if (normUser === normTarget) return true;
-    } 
-    // 2. 標準（部分一致・表記揺れを一定許容）
-    else if (level === 'standard') {
-      if (normUser === normTarget) return true;
-      if (normTarget.includes(normUser) && normUser.length >= 2) return true;
-      if (normUser.includes(normTarget)) return true;
-    } 
-    // 3. 緩め（キーワード・主要部が含まれていればOK）
-    else if (level === 'lenient') {
-      if (normUser === normTarget) return true;
-      if (normTarget.includes(normUser) || normUser.includes(normTarget)) return true;
-      // 1文字以上の共通部分判定
+    } else if (level === 'standard') {
+      if (normUser === normTarget || (normTarget.includes(normUser) && normUser.length >= 2) || normUser.includes(normTarget)) return true;
+    } else if (level === 'lenient') {
+      if (normUser === normTarget || normTarget.includes(normUser) || normUser.includes(normTarget)) return true;
       for (let char of normUser) {
         if (normTarget.includes(char)) return true;
       }
@@ -628,51 +742,92 @@ function validateWritingAnswer(userInput, q, level) {
   return false;
 }
 
-// 解答チェックとフィードバック表示
-function checkAnswer(isCorrect, targetAnswer, userInput = '') {
+function checkAnswer(isCorrect, userAnsText) {
   const q = currentQuestions[currentIndex];
-  const feedbackBox = document.getElementById('feedbackBox');
-  const feedbackTitle = document.getElementById('feedbackTitle');
-  const explanationText = document.getElementById('explanationText');
 
-  // 入力欄を無効化
+  // 記録の保存
+  quizHistory.push({
+    question: q,
+    userAnswer: userAnsText,
+    isCorrect: isCorrect
+  });
+
   const writeInput = document.getElementById('writeInput');
   if (writeInput) writeInput.disabled = true;
 
+  const feedbackBox = document.getElementById('feedbackBox');
   feedbackBox.style.display = 'block';
+  feedbackBox.className = `feedback-box ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}`;
   
-  if (isCorrect) {
-    feedbackBox.className = 'feedback-box feedback-correct';
-    feedbackTitle.innerText = '⭕ 正解！';
-  } else {
-    feedbackBox.className = 'feedback-box feedback-incorrect';
-    feedbackTitle.innerText = '❌ 不正解...';
-  }
+  document.getElementById('feedbackTitle').innerText = isCorrect ? '⭕ 正解！' : '❌ 不正解...';
 
-  let html = `<div><strong>正解:</strong> ${targetAnswer}</div>`;
-  if (userInput) {
-    html += `<div><strong>あなたの入力:</strong> ${userInput}</div>`;
+  let html = `<div><strong>正解:</strong> ${q.correctAnswer}</div>`;
+  if (userAnsText !== q.correctAnswer) {
+    html += `<div><strong>あなたの回答:</strong> ${userAnsText}</div>`;
   }
-  html += `<div style="margin-top: 6px;"><strong>【主な意味一覧】:</strong> ${q.allMeanings.join(' / ')}</div>`;
+  html += `<div style="margin-top: 6px;"><strong>【意味一覧】:</strong> ${q.allMeanings.join(' / ')}</div>`;
 
-  explanationText.innerHTML = html;
+  document.getElementById('explanationText').innerHTML = html;
 }
 
-// 次の問題に進む
 function nextQuestion() {
   currentIndex++;
   showQuestion();
 }
 
-// キーボードのEnterキー対応
+// 最終結果の表示
+function showResults() {
+  document.getElementById('quizScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'block';
+
+  const correctCount = quizHistory.filter(h => h.isCorrect).length;
+  const totalCount = quizHistory.length;
+  const percentage = Math.round((correctCount / totalCount) * 100);
+
+  document.getElementById('resultScoreText').innerText = `${totalCount} 問中 ${correctCount} 問正解 (${percentage}%)`;
+
+  // 間違えた単語IDの一覧を保持
+  lastWrongWordIds = [...new Set(quizHistory.filter(h => !h.isCorrect).map(h => h.question.id))];
+
+  const reviewBtn = document.getElementById('reviewBtn');
+  if (lastWrongWordIds.length > 0) {
+    reviewBtn.style.display = 'block';
+    reviewBtn.innerText = `間違えた問題（${lastWrongWordIds.length}問）を解き直す`;
+  } else {
+    reviewBtn.style.display = 'none';
+  }
+
+  // 詳細リスト描画
+  const listContainer = document.getElementById('resultList');
+  listContainer.innerHTML = '';
+
+  quizHistory.forEach((item, idx) => {
+    const q = item.question;
+    const div = document.createElement('div');
+    div.className = 'result-item';
+
+    const qTitle = q.isExample 
+      ? `問${idx+1}: [No.${q.id} ${q.word}] ${q.questionText}` 
+      : `問${idx+1}: No.${q.id} ${q.word} 【${q.kanji}】`;
+
+    div.innerHTML = `
+      <div class="result-item-header">
+        <span>${qTitle}</span>
+        <span class="${item.isCorrect ? 'text-correct' : 'text-incorrect'}">${item.isCorrect ? '⭕ 正解' : '❌ 不正解'}</span>
+      </div>
+      <div><strong>あなたの回答:</strong> ${item.userAnswer}</div>
+      <div><strong>正解:</strong> ${q.correctAnswer}</div>
+    `;
+    listContainer.appendChild(div);
+  });
+}
+
+// キーボードEnterイベント
 document.getElementById('writeInput').addEventListener('keypress', function (e) {
   if (e.key === 'Enter') {
     submitWriteAnswer();
   }
 });
-
-// アプリの起動
-window.onload = resetQuiz;
 </script>
 </body>
 </html>
