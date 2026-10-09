@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>シス単風 古文単語Webアプリ</title>
+  <style>
+    :root {
+      --primary-color: #0070f3;
+      --primary-hover: #0051a8;
+      --bg-color: #f0f2f5;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+      --sub-text: #666666;
+      --correct-color: #2e7d32;
+      --incorrect-color: #c62828;
+      --border-color: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      width: 100%;
+      max-width: 580px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+    }
+
+    header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 20px;
+      color: var(--primary-color);
+    }
+
+    /* 設定パネル */
+    .setting-group {
+      background-color: #f8f9fa;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .range-inputs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    select, input[type="number"], input[type="text"] {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: white;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input[type="number"] {
+      width: 70px;
+      text-align: center;
+    }
+
+    .start-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+
+    .start-btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* クイズカード */
+    .card {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      background: #fafafa;
+    }
+
+    .badge-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: white;
+      background-color: var(--primary-color);
+    }
+
+    .badge-pos {
+      background-color: #6c757d;
+    }
+
+    .word-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .word-kanji {
+      font-size: 14px;
+      color: var(--sub-text);
+      margin-bottom: 12px;
+    }
+
+    .example-box {
+      background: #ffffff;
+      border-left: 4px solid var(--primary-color);
+      padding: 12px;
+      border-radius: 4px;
+      margin-top: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .example-text {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .example-trans {
+      font-size: 14px;
+      color: #444;
+    }
+
+    /* 4択エリア */
+    .btn-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      width: 100%;
+      padding: 14px;
+      text-align: left;
+      font-size: 15px;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .option-btn:hover {
+      background-color: #eef5ff;
+      border-color: var(--primary-color);
+    }
+
+    /* 書き取りエリア */
+    .write-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .write-input {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .write-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0,112,243,0.1);
+    }
+
+    /* フィードバック表示 */
+    .feedback-box {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      display: none;
+    }
+
+    .feedback-correct {
+      background-color: #e8f5e9;
+      color: var(--correct-color);
+      border: 1px solid #a5d6a7;
+    }
+
+    .feedback-incorrect {
+      background-color: #ffebee;
+      color: var(--incorrect-color);
+      border: 1px solid #ef9a9a;
+    }
+
+    .explanation-box {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #333;
+      text-align: left;
+      font-weight: normal;
+    }
+
+    .next-btn {
+      margin-top: 12px;
+      width: 100%;
+      padding: 10px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .progress-text {
+      text-align: right;
+      font-size: 12px;
+      color: var(--sub-text);
+      margin-bottom: 8px;
+    }
+
+    /* 結果画面 */
+    .result-score {
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+    }
+
+    .result-list {
+      max-height: 320px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    .result-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+    }
+
+    .result-item-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .text-correct { color: var(--correct-color); }
+    .text-incorrect { color: var(--incorrect-color); }
+
+    .btn-group-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .review-btn {
+      background-color: #e65100;
+      color: white;
+    }
+
+    .review-btn:hover {
+      background-color: #b23c00;
+    }
+
+    .secondary-btn {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .secondary-btn:hover {
+      background-color: #5a6268;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>古文単語システムクイズ</h1>
+  </header>
+
+  <!-- 1. 設定パネル -->
+  <div id="setupScreen">
+    <div class="setting-group">
+      <div class="setting-row">
+        <label>出題範囲:</label>
+        <div class="range-inputs">
+          <input type="number" id="rangeStart" value="1" min="1" max="10">
+          <span>〜</span>
+          <input type="number" id="rangeEnd" value="10" min="1" max="10">
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <label for="questionCount">出題数:</label>
+        <input type="number" id="questionCount" value="10" min="1" max="10">
+      </div>
+
+      <div class="setting-row">
+        <label for="orderSelect">出題順序:</label>
+        <select id="orderSelect">
+          <option value="order">順番通り</option>
+          <option value="random">ランダム</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <label for="modeSelect">出題形式:</label>
+        <select id="modeSelect" onchange="toggleWriteLevelUI()">
+          <option value="meaning-choice">単語の意味（4択）</option>
+          <option value="meaning-write">単語の意味（書き取り）</option>
+          <option value="example-choice">例文訳の穴埋め（4択）</option>
+          <option value="example-write">例文訳の穴埋め（書き取り）</option>
+        </select>
+      </div>
+
+      <div class="setting-row" id="judgeLevelRow" style="display: none;">
+        <label for="levelSelect">書き取り判定基準:</label>
+        <select id="levelSelect">
+          <option value="strict">1. 厳密（完全一致）</option>
+          <option value="standard" selected>2. 標準（部分・揺らぎ許容）</option>
+          <option value="lenient">3. 緩め（キーワード許容）</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="start-btn" onclick="startQuiz(false)">テストを開始する</button>
+  </div>
+
+  <!-- 2. クイズ実行画面 -->
+  <div id="quizScreen" style="display: none;">
+    <div class="progress-text" id="progressText">第 1 / 10 問</div>
+
+    <div class="card">
+      <div class="badge-container">
+        <span class="badge" id="wordBadge">No. 1</span>
+        <span class="badge badge-pos" id="posBadge">動・ラ変</span>
+      </div>
+      
+      <div class="word-title" id="wordTitle">あり</div>
+      <div class="word-kanji" id="kanjiTitle">【有り・在り】</div>
+
+      <div class="example-box" id="exampleBox" style="display: none;">
+        <div class="example-text" id="exampleText">昔、男ありけり。</div>
+        <div class="example-trans" id="exampleTrans">昔、男が[ ??? ]。</div>
+      </div>
+    </div>
+
+    <div id="answerArea">
+      <!-- 4択UI -->
+      <div class="btn-grid" id="choiceContainer"></div>
+
+      <!-- 書き取りUI -->
+      <div class="write-container" id="writeContainer" style="display: none;">
+        <input type="text" id="writeInput" class="write-input" placeholder="解答を入力してください" autocomplete="off">
+        <button class="start-btn" onclick="submitWriteAnswer()">回答する</button>
+      </div>
+    </div>
+
+    <!-- 結果フィードバック -->
+    <div class="feedback-box" id="feedbackBox">
+      <div id="feedbackTitle"></div>
+      <div class="explanation-box" id="explanationText"></div>
+      <button class="next-btn" onclick="nextQuestion()">次の問題へ</button>
+    </div>
+  </div>
+
+  <!-- 3. 最終結果画面 -->
+  <div id="resultScreen" style="display: none;">
+    <div class="result-score" id="resultScoreText">10 問中 8 問正解 (80%)</div>
+    
+    <div class="result-list" id="resultList"></div>
+
+    <div class="btn-group-vertical">
+      <button class="start-btn review-btn" id="reviewBtn" onclick="startQuiz(true)">間違えた問題だけを解き直す</button>
+      <button class="start-btn secondary-btn" onclick="showSetupScreen()">設定に戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// データベース（全10問）
+const wordsData = [
+  {
+    id: 1,
+    word: "あり",
+    kanji: "有り・在り",
+    partOfSpeech: "動・ラ変",
+    meanings: ["ある。いる。", "生きている。", "「〜とあり」の形で 言う。書いている。"],
+    examples: [
+      { text: "昔、男ありけり。", translation: "昔、男が[いた]。", blankTarget: "いた" },
+      { text: "世の中こそ、あるにつけてもあじきなきものなりけれ。", translation: "世の中は、[生きている]につけてもむなしいものであったのだ。", blankTarget: "生きている" },
+      { text: "ほとのぎす待つ歌よめとありければはよめる", translation: "（原上人たちが）ほととぎすの初音を待つ歌を詠んでくれと[言った]ので詠んだ（歌）。", blankTarget: "言った" }
+    ]
+  },
+  {
+    id: 2,
+    word: "なし",
+    kanji: "無し",
+    partOfSpeech: "形・ク",
+    meanings: ["ない。いない。", "生きていない。この世にいない。", "不在だ。留守だ。"],
+    examples: [
+      { text: "大蔵卿ばかり耳とき人はなし。", translation: "大蔵卿ほど耳敏い人は[いない]。", blankTarget: "いない" },
+      { text: "今はなき人なれば、ばかりの事も忘れがたし。", translation: "今は（この世に）[生きていない]人であるので、この程度のことも忘れ難い。", blankTarget: "生きていない" },
+      { text: "東風吹かばにおひおこせよ梅の花主なしとて春を忘るな", translation: "東風が吹いたならば香りをよこしておくれ、梅の花よ。主人が[不在だ]として春を忘れるな。", blankTarget: "不在だ" }
+    ]
+  },
+  {
+    id: 3,
+    word: "ゐる",
+    kanji: "居る",
+    partOfSpeech: "動・ワ上一",
+    meanings: ["座る。座っている。", "いる。"],
+    examples: [
+      { text: "立ちて見、居て見、見れど、去年に似るべくもあらず。", translation: "（男は）立って見、[座って]見、（あたりを）見るけれど（内は）去年と同じはずもない。", blankTarget: "座って" },
+      { text: "久しく里にゐたり。", translation: "（私は）長いこと実家に[いた]。", blankTarget: "いた" }
+    ]
+  },
+  {
+    id: 4,
+    word: "ありく",
+    kanji: "歩く",
+    partOfSpeech: "動・カ四",
+    meanings: ["動き回る。歩き回る。出歩く。", "〔動詞の連用形に付いて〕〜して回る。（時間的に）〜し続ける。"],
+    examples: [
+      { text: "舟に乗りてありく人ばかり、あざましうゆゆしきものこそなけれ。", translation: "舟に乗って（海を）[動き回る]人ほど、呆れるほど恐ろしいものはない。", blankTarget: "動き回る" },
+      { text: "その辺り、ここかしこ見ありき、田舎びたる所、山里などは、いと目慣れぬ事のみぞ多かる。", translation: "（旅先の）そのあたりを、あちこち[見て回り]、ひなびた所や、山里などは、まったく見慣れない事ばかりが多くある。", blankTarget: "見て回り" }
+    ]
+  },
+  {
+    id: 5,
+    word: "さる",
+    kanji: "去る・避る",
+    partOfSpeech: "動・ラ四",
+    meanings: ["立ち去る。離れる。", "離縁する。離婚する。", "避ける。よける。", "断る。辞退する。", "（時が）来る。（時が）至る。"],
+    examples: [
+      { text: "男遅く西へ下りなおとするに、この妻を去りて、たちまちにたよりある母の身をまけてけり。", translation: "男は（京から）西国へ下ろうとする時に、この妻と[離婚して]、すぐに頼みのある母の身を助けて行った。", blankTarget: "離婚して" },
+      { text: "かの左衛門督はえ去らざなり。また、そこにさらば、こと人こそはなるべけれ。", translation: "また、あなたが[断り]なさるならば、ほかの人がおなりになることはできないだろう。", blankTarget: "断り" },
+      { text: "夕されば野辺の秋風身にしみて鶉鳴くなり深草の里", translation: "夕方に[なると]、野辺の秋風が身にしみて、ウズラの鳴く声が聞こえる、深草の里よ。", blankTarget: "なると" }
+    ]
+  },
+  {
+    id: 6,
+    word: "ものす",
+    kanji: "物す",
+    partOfSpeech: "動・サ変",
+    meanings: ["ある。いる。", "行く。来る。", "言う。書く。", "食べる。飲む。", "（何かを）する。（何かを）行う。"],
+    examples: [
+      { text: "日ごとのしうる人、今日そ帰りめる。", translation: "（私のところへ）毎日[来た]人が、今日（京へ）帰ってしまうようだ。", blankTarget: "来た" },
+      { text: "この人につきて、いとしのびてもものし給へ。", translation: "この人（の後）に付いて、とても人目を避けて[来てください]。", blankTarget: "来てください" },
+      { text: "心惣して、物もしぬ給はで、ひそまりめ。", translation: "（老人たちは）気分が悪くなって、何も[お食べにならないで]、眠りについてしまった。", blankTarget: "お食べにならないで" }
+    ]
+  },
+  {
+    id: 7,
+    word: "きこゆ",
+    kanji: "聞こゆ",
+    partOfSpeech: "動・下二",
+    meanings: ["聞こえる。耳に入る。", "世に知られる。評判になる。耳にする。", "理解される。意味がわかる。"],
+    examples: [
+      { text: "古近の司の宿直申しの吉聞こゆるは、乱になりぬるなるべし。", translation: "の声が[聞こえる]のは、午前二時になったのであろう。", blankTarget: "聞こえる" },
+      { text: "これ、昔、名高く聞こえたる所なり。", translation: "ここは、昔、名高く[世に知られた]所である。", blankTarget: "世に知られた" },
+      { text: "年老い、袈裟かけた法師の、小僧の肩をおさへて、聞こえぬ事ども言ひつつ、よろめきたる、いとこはがゆし。", translation: "年老い、袈裟をかけた法師が、小僧の肩を押さえて、[理解されない]言葉を口にしては、よろめいているのは、とても苦々しい。", blankTarget: "理解されない" }
+    ]
+  },
+  {
+    id: 8,
+    word: "見ゆ",
+    kanji: "見ゆ",
+    partOfSpeech: "動・下二",
+    meanings: ["見える。目に入る。", "現れる。姿を見せる。会う。", "（人に）見られる。（人に）見せる。", "（女性が）結婚する。妻になる。"],
+    examples: [
+      { text: "月あかるければ、いとよくありさま見ゆ。", translation: "月明かりが明るいので、とてもよく（辺りの）様子が[見える]。", blankTarget: "見える" },
+      { text: "さても、かばかりの車に車入らぬ門やはある。見えば笑ふたむ。", translation: "手にしても、これほどの客の車が入らない門があるか（いやない）。（客の主人が）[現れたら]笑ってやろう。", blankTarget: "現れたら" },
+      { text: "ただ、人に見えんぞねたき。", translation: "ただ、（この冊子が）人に[見られた]ようなことがしゃくにさわる。", blankTarget: "見られた" }
+    ]
+  },
+  {
+    id: 9,
+    word: "おぼゆ",
+    kanji: "覚ゆ",
+    partOfSpeech: "動・下二",
+    meanings: ["（自然に）思われる。感じられる。", "（自然に）思い出される。思い浮かぶ。", "似る。似かよう。", "（人から）思われる。"],
+    examples: [
+      { text: "樒の香の頭に香の内の日に吹きまがひて、生ける仏の国とおぼゆ。", translation: "庭（は）頭の香りも香薫の中の薫香と風に吹かれて入りまじりて、生きている（この世の）極楽浄土に[思われる]。", blankTarget: "思われる" },
+      { text: "これにただいま思い出されるような古歌を一づつ書け。", translation: "これに今すぐ[思い出される]ような古歌を一首ずつ書け。", blankTarget: "思い出される" },
+      { text: "尼君の見上げたるに、少しおぼえたるところあれば、はた生けりと見給ふ。", translation: "尼君が（少女を）見上げている顔立ちに、（少女は）少し[似ている]ところがあるので、（光源氏は）子であろうとご覧になる。", blankTarget: "似ている" }
+    ]
+  },
+  {
+    id: 10,
+    word: "こころ",
+    kanji: "心",
+    partOfSpeech: "名",
+    meanings: ["情趣を解する心。風流心。風情。", "情愛。思いやり。", "意味。道理。"],
+    examples: [
+      { text: "こころなき身にもあはれは知られけり鴫立つ沢の秋の夕暮", translation: "[情趣を解する心]のない我が身にもしみじみとした情趣は自然とわかるのだなあ。鴫が飛び立つ水辺の秋の夕暮れであることよ。", blankTarget: "情趣を解する心" },
+      { text: "歌は題のこころをよく理解すべきである。", translation: "和歌は題の[意味]をよく理解すべきである。", blankTarget: "意味" }
+    ]
+  }
+];
+
+// アプリ状態
+let currentQuestions = [];
+let currentIndex = 0;
+let quizHistory = [];
+let lastWrongWordIds = [];
+
+function toggleWriteLevelUI() {
+  const mode = document.getElementById('modeSelect').value;
+  document.getElementById('judgeLevelRow').style.display = mode.endsWith('-write') ? 'flex' : 'none';
+}
+
+function showSetupScreen() {
+  document.getElementById('setupScreen').style.display = 'block';
+  document.getElementById('quizScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'none';
+}
+
+// テスト開始・復習開始
+function startQuiz(isReview = false) {
+  const mode = document.getElementById('modeSelect').value;
+  const order = document.getElementById('orderSelect').value;
+  const isWriteMode = mode.endsWith('-write');
+
+  let targetWords = [];
+
+  if (isReview) {
+    targetWords = wordsData.filter(w => lastWrongWordIds.includes(w.id));
+  } else {
+    const start = parseInt(document.getElementById('rangeStart').value) || 1;
+    const end = parseInt(document.getElementById('rangeEnd').value) || 10;
+    const count = parseInt(document.getElementById('questionCount').value) || 10;
+
+    let filtered = wordsData.filter(w => w.id >= start && w.id <= end);
+    if (order === 'random') {
+      filtered.sort(() => Math.random() - 0.5);
+    }
+    targetWords = filtered.slice(0, count);
+  }
+
+  if (targetWords.length === 0) {
+    alert("対象となる単語が見つかりませんでした。範囲や条件を確認してください。");
+    return;
+  }
+
+  // 問題構造生成
+  currentQuestions = targetWords.map(w => {
+    if (mode.startsWith('example')) {
+      const randomEx = w.examples[Math.floor(Math.random() * w.examples.length)];
+      return {
+        id: w.id,
+        word: w.word,
+        kanji: w.kanji,
+        pos: w.partOfSpeech,
+        isExample: true,
+        questionText: randomEx.text,
+        questionTrans: randomEx.translation.replace(`[${randomEx.blankTarget}]`, "[ ??? ]"),
+        correctAnswer: randomEx.blankTarget,
+        allMeanings: w.meanings
+      };
+    } else {
+      return {
+        id: w.id,
+        word: w.word,
+        kanji: w.kanji,
+        pos: w.partOfSpeech,
+        isExample: false,
+        correctAnswer: w.meanings[0],
+        allMeanings: w.meanings
+      };
+    }
+  });
+
+  if (isReview && order === 'random') {
+    currentQuestions.sort(() => Math.random() - 0.5);
+  }
+
+  currentIndex = 0;
+  quizHistory = [];
+
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('quizScreen').style.display = 'block';
+
+  document.getElementById('choiceContainer').style.display = isWriteMode ? 'none' : 'flex';
+  document.getElementById('writeContainer').style.display = isWriteMode ? 'flex' : 'none';
+
+  showQuestion();
+}
+
+function showQuestion() {
+  if (currentIndex >= currentQuestions.length) {
+    showResults();
+    return;
+  }
+
+  const q = currentQuestions[currentIndex];
+  const mode = document.getElementById('modeSelect').value;
+
+  document.getElementById('progressText').innerText = `第 ${currentIndex + 1} / ${currentQuestions.length} 問`;
+  document.getElementById('wordBadge').innerText = `No. ${q.id}`;
+  document.getElementById('posBadge').innerText = q.pos;
+  document.getElementById('wordTitle').innerText = q.word;
+  document.getElementById('kanjiTitle').innerText = `【${q.kanji}】`;
+
+  const exampleBox = document.getElementById('exampleBox');
+  if (q.isExample) {
+    exampleBox.style.display = 'block';
+    document.getElementById('exampleText').innerText = q.questionText;
+    document.getElementById('exampleTrans').innerText = q.questionTrans;
+  } else {
+    exampleBox.style.display = 'none';
+  }
+
+  document.getElementById('feedbackBox').style.display = 'none';
+
+  if (mode.endsWith('-choice')) {
+    generateChoices(q);
+  } else {
+    const writeInput = document.getElementById('writeInput');
+    writeInput.value = '';
+    writeInput.disabled = false;
+    writeInput.focus();
+  }
+}
+
+function generateChoices(q) {
+  const container = document.getElementById('choiceContainer');
+  container.innerHTML = '';
+
+  let choices = [q.correctAnswer];
+  while (choices.length < 4) {
+    const randomWord = wordsData[Math.floor(Math.random() * wordsData.length)];
+    let dummy = q.isExample ? randomWord.examples[0].blankTarget : randomWord.meanings[0];
+    if (!choices.includes(dummy)) choices.push(dummy);
+  }
+  choices.sort(() => Math.random() - 0.5);
+
+  choices.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerText = opt;
+    btn.onclick = () => checkAnswer(opt === q.correctAnswer, opt);
+    container.appendChild(btn);
+  });
+}
+
+function submitWriteAnswer() {
+  const userInput = document.getElementById('writeInput').value.trim();
+  if (!userInput) return;
+
+  const q = currentQuestions[currentIndex];
+  const level = document.getElementById('levelSelect').value;
+  const isCorrect = validateWritingAnswer(userInput, q, level);
+  checkAnswer(isCorrect, userInput);
+}
+
+// 改修後の正誤判定処理（同じ単語の別の意味は誤答とする）
+function validateWritingAnswer(userInput, q, level) {
+  const normalize = (str) => str.replace(/[\s、。・！!？?「」『』（）()\n\t-]/g, '').toLowerCase();
+  const normUser = normalize(userInput);
+  const normTarget = normalize(q.correctAnswer);
+
+  if (!normUser) return false;
+
+  // 1. 同一単語の「別の意味（正解以外の意味）」リストを作成
+  const otherMeanings = q.allMeanings.filter(m => normalize(m) !== normTarget);
+
+  // 2. ユーザーの入力が「別の意味」に該当している場合は、正解(q.correctAnswer)に含まれていなければ誤答とする
+  for (let other of otherMeanings) {
+    const normOther = normalize(other);
+    // 別の意味と一致、または入力が別の意味の主要フレーズであり正解と一致しない場合
+    if (normUser === normOther || (normUser.length >= 2 && normOther.includes(normUser) && !normTarget.includes(normUser))) {
+      return false;
+    }
+  }
+
+  // 3. 出題中の正解（q.correctAnswer）に対する判定
+  if (level === 'strict') {
+    return normUser === normTarget;
+  } else if (level === 'standard') {
+    if (normUser === normTarget) return true;
+    if (normUser.length >= 2 && (normTarget.includes(normUser) || normUser.includes(normTarget))) return true;
+  } else if (level === 'lenient') {
+    if (normUser === normTarget) return true;
+    // 緩め判定：出題中の特定の正解と相互に包含関係がある場合に許可
+    if (normTarget.includes(normUser) || normUser.includes(normTarget)) return true;
+  }
+
+  return false;
+}
+
+function checkAnswer(isCorrect, userAnsText) {
+  const q = currentQuestions[currentIndex];
+
+  quizHistory.push({
+    question: q,
+    userAnswer: userAnsText,
+    isCorrect: isCorrect
+  });
+
+  const writeInput = document.getElementById('writeInput');
+  if (writeInput) writeInput.disabled = true;
+
+  const feedbackBox = document.getElementById('feedbackBox');
+  feedbackBox.style.display = 'block';
+  feedbackBox.className = `feedback-box ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}`;
+  
+  document.getElementById('feedbackTitle').innerText = isCorrect ? '⭕ 正解！' : '❌ 不正解...';
+
+  let html = `<div><strong>正解:</strong> ${q.correctAnswer}</div>`;
+  if (userAnsText !== q.correctAnswer) {
+    html += `<div><strong>あなたの回答:</strong> ${userAnsText}</div>`;
+  }
+  html += `<div style="margin-top: 6px;"><strong>【意味一覧】:</strong> ${q.allMeanings.join(' / ')}</div>`;
+
+  document.getElementById('explanationText').innerHTML = html;
+}
+
+function nextQuestion() {
+  currentIndex++;
+  showQuestion();
+}
+
+function showResults() {
+  document.getElementById('quizScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'block';
+
+  const correctCount = quizHistory.filter(h => h.isCorrect).length;
+  const totalCount = quizHistory.length;
+  const percentage = Math.round((correctCount / totalCount) * 100);
+
+  document.getElementById('resultScoreText').innerText = `${totalCount} 問中 ${correctCount} 問正解 (${percentage}%)`;
+
+  lastWrongWordIds = [...new Set(quizHistory.filter(h => !h.isCorrect).map(h => h.question.id))];
+
+  const reviewBtn = document.getElementById('reviewBtn');
+  if (lastWrongWordIds.length > 0) {
+    reviewBtn.style.display = 'block';
+    reviewBtn.innerText = `間違えた問題（${lastWrongWordIds.length}問）を解き直す`;
+  } else {
+    reviewBtn.style.display = 'none';
+  }
+
+  const listContainer = document.getElementById('resultList');
+  listContainer.innerHTML = '';
+
+  quizHistory.forEach((item, idx) => {
+    const q = item.question;
+    const div = document.createElement('div');
+    div.className = 'result-item';
+
+    const qTitle = q.isExample 
+      ? `問${idx+1}: [No.${q.id} ${q.word}] ${q.questionText}` 
+      : `問${idx+1}: No.${q.id} ${q.word} 【${q.kanji}】`;
+
+    div.innerHTML = `
+      <div class="result-item-header">
+        <span>${qTitle}</span>
+        <span class="${item.isCorrect ? 'text-correct' : 'text-incorrect'}">${item.isCorrect ? '⭕ 正解' : '❌ 不正解'}</span>
+      </div>
+      <div><strong>あなたの回答:</strong> ${item.userAnswer}</div>
+      <div><strong>正解:</strong> ${q.correctAnswer}</div>
+    `;
+    listContainer.appendChild(div);
+  });
+}
+
+document.getElementById('writeInput').addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    submitWriteAnswer();
+  }
+});
+</script>
+</body>
+</html>
