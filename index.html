@@ -345,15 +345,15 @@
       <div class="setting-row">
         <label>出題範囲:</label>
         <div class="range-inputs">
-          <input type="number" id="rangeStart" value="1" min="1" max="10">
+          <input type="number" id="rangeStart" value="11" min="1" max="20">
           <span>〜</span>
-          <input type="number" id="rangeEnd" value="10" min="1" max="10">
+          <input type="number" id="rangeEnd" value="20" min="1" max="20">
         </div>
       </div>
 
       <div class="setting-row">
         <label for="questionCount">出題数:</label>
-        <input type="number" id="questionCount" value="10" min="1" max="10">
+        <input type="number" id="questionCount" value="10" min="1" max="20">
       </div>
 
       <div class="setting-row">
@@ -379,7 +379,7 @@
         <select id="levelSelect">
           <option value="strict">1. 厳密（完全一致）</option>
           <option value="standard" selected>2. 標準（部分・揺らぎ許容）</option>
-          <option value="lenient">3. 緩め（単語・主要語含む）</option>
+          <option value="lenient">3. 緩め（キーワード許容）</option>
         </select>
       </div>
     </div>
@@ -393,16 +393,16 @@
 
     <div class="card">
       <div class="badge-container">
-        <span class="badge" id="wordBadge">No. 1</span>
-        <span class="badge badge-pos" id="posBadge">動・ラ変</span>
+        <span class="badge" id="wordBadge">No. 11</span>
+        <span class="badge badge-pos" id="posBadge">形動・ナリ</span>
       </div>
       
-      <div class="word-title" id="wordTitle">あり</div>
-      <div class="word-kanji" id="kanjiTitle">【有り・在り】</div>
+      <div class="word-title" id="wordTitle">あはれなり</div>
+      <div class="word-kanji" id="kanjiTitle">【哀なり】</div>
 
       <div class="example-box" id="exampleBox" style="display: none;">
-        <div class="example-text" id="exampleText">昔、男ありけり。</div>
-        <div class="example-trans" id="exampleTrans">昔、男が[ ??? ]。</div>
+        <div class="example-text" id="exampleText"></div>
+        <div class="example-trans" id="exampleTrans"></div>
       </div>
     </div>
 
@@ -427,7 +427,7 @@
 
   <!-- 3. 最終結果画面 -->
   <div id="resultScreen" style="display: none;">
-    <div class="result-score" id="resultScoreText">10 問中 8 問正解 (80%)</div>
+    <div class="result-score" id="resultScoreText">10 問中 0 問正解 (0%)</div>
     
     <div class="result-list" id="resultList"></div>
 
@@ -439,7 +439,7 @@
 </div>
 
 <script>
-// データベース（全10問）
+// データベース（全20問：No.1〜20）
 const wordsData = [
   {
     id: 1,
@@ -531,7 +531,7 @@ const wordsData = [
     meanings: ["見える。目に入る。", "現れる。姿を見せる。会う。", "（人に）見られる。（人に）見せる。", "（女性が）結婚する。妻になる。"],
     examples: [
       { text: "月あかるければ、いとよくありさま見ゆ。", translation: "月明かりが明るいので、とてもよく（辺りの）様子が[見える]。", blankTarget: "見える" },
-      { text: "さても、かばかりの車に車入らぬ門やはある。見えば笑ふたむ。", translation: "手にしても、これほどの客の車が入らない門があるか（いやない）。（客の主人が）[現れたら]笑ってやろう。", blankTarget: "現れたら" },
+      { text: "さても、かばかりの車に車入らぬ門やはある。見えば笑ふたむ。", translation: "それにしても、これほどの客の車が入らない門があるか（いやない）。（客の主人が）[現れたら]笑ってやろう。", blankTarget: "現れたら" },
       { text: "ただ、人に見えんぞねたき。", translation: "ただ、（この冊子が）人に[見られた]ようなことがしゃくにさわる。", blankTarget: "見られた" }
     ]
   },
@@ -556,6 +556,114 @@ const wordsData = [
     examples: [
       { text: "こころなき身にもあはれは知られけり鴫立つ沢の秋の夕暮", translation: "[情趣を解する心]のない我が身にもしみじみとした情趣は自然とわかるのだなあ。鴫が飛び立つ水辺の秋の夕暮れであることよ。", blankTarget: "情趣を解する心" },
       { text: "歌は題のこころをよく理解すべきである。", translation: "和歌は題の[意味]をよく理解すべきである。", blankTarget: "意味" }
+    ]
+  },
+  {
+    id: 11,
+    word: "あはれなり",
+    kanji: "哀なり",
+    partOfSpeech: "形動・ナリ",
+    meanings: ["しみじみと心動かされる。", "しみじみとした風情がある。"],
+    examples: [
+      { text: "折節の移り変わるまゝは、何事につけてもしみじみとした風情がある。", translation: "季節の移り変わるままは、何事につけても[しみじみとした風情がある]。", blankTarget: "しみじみとした風情がある" },
+      { text: "あはれなるもの、手ある人の子。", translation: "しみじみと心を動かされるもの、[手書きの字が上手な人の子]。", blankTarget: "手書きの字が上手な人の子" }
+    ]
+  },
+  {
+    id: 12,
+    word: "をかし",
+    kanji: "良し・可し",
+    partOfSpeech: "形・シク",
+    meanings: ["滑稽だ。おかしい。", "情趣がある。風情がある。", "おもしろい。興味深い。", "かわいらしい。美しい。", "すばらしい。すぐれている。"],
+    examples: [
+      { text: "あさましうをかしけれど、つゆばかり笑ふ気色も見せず。", translation: "ひどく[おかしい]けれども、ほんの少しも笑う様子も見せない。", blankTarget: "おかしい" },
+      { text: "雛のなが、ひよがどやがましく聞いて、人の後ろに立ちてありくも、をかし。", translation: "人形のなが、ひよがどやがましく聞いて、人の後ろに立ってありくのも、[おもしろい]。", blankTarget: "おもしろい" }
+    ]
+  },
+  {
+    id: 13,
+    word: "ゆかし",
+    kanji: "欲し",
+    partOfSpeech: "形・シク",
+    meanings: ["見たい。聞きたい。知りたい。", "心がひかれる。慕わしい。"],
+    examples: [
+      { text: "ねびゆかすおさままゆかし人かな。", translation: "成長していく様子を[見たい]人だなあ。", blankTarget: "見たい" },
+      { text: "うれしきもの。まだ見ぬ物語の一巻を見て、続きの心あがりの、のこり見出でたる。", translation: "うれしいもの。まだ読んでいない物語の一巻を見て、[続きが読みたい]。", blankTarget: "続きが読みたい" }
+    ]
+  },
+  {
+    id: 14,
+    word: "かなし",
+    kanji: "悲し・愛し",
+    partOfSpeech: "形・シク",
+    meanings: ["愛しい。かわいい。", "悲しい。つらい。", "恐い。残念だ。", "すばらしい。かわいい。"],
+    examples: [
+      { text: "人の心ぎをばかりかなしきはなし。", translation: "人の心ぎをばかり[悲しい]ことはなし。", blankTarget: "悲しい" },
+      { text: "我が子しいと忍ぶるなりと思ふに、あはれにかなしきこと限りなし。", translation: "自分のいとしいと思う娘を思うと、[悲しくて堪らない]。", blankTarget: "悲しくて堪らない" }
+    ]
+  },
+  {
+    id: 15,
+    word: "おもひやる",
+    kanji: "思い遣る",
+    partOfSpeech: "動・ラ四",
+    meanings: ["思いをはせる。想像する。", "（鬱積した）気を晴らす。気晴らしをする。"],
+    examples: [
+      { text: "その院、昔を思ひやりて見れば、おもしろかりける所なり。", translation: "その院、昔を[偲びつつ見れば]、おもしろかるべき所なり。", blankTarget: "偲びつつ見れば" },
+      { text: "かららむ世を思ひやるに、なは見てうたを、何気なく思ひしめめる事もある所である。", translation: "（自分が）この世にいない時（事）を[想像すると]、やはり気がかりになる。", blankTarget: "想像すると" }
+    ]
+  },
+  {
+    id: 16,
+    word: "けしき",
+    kanji: "気色",
+    partOfSpeech: "名",
+    meanings: ["（自然の）様子。気配。", "（人の）様子。顔色。態度。", "機嫌。気分。", "意向。内々の考え。内々の思い。"],
+    examples: [
+      { text: "今日、風、雲のけしきはなはだたし悪し。", translation: "今日、風、雲の[様子]ははなはだ悪し。", blankTarget: "様子" },
+      { text: "この人の（の）態、いとしのびてもものし給へ。今日時は、風、雲のけしきはなはだ悪し。", translation: "この人につきて、いとしのびてもものし給へ。今日の（の）態、[機嫌]を損ねるな。", blankTarget: "機嫌" }
+    ]
+  },
+  {
+    id: 17,
+    word: "はづかし",
+    kanji: "恥ずかし",
+    partOfSpeech: "形・シク",
+    meanings: ["（相手が立派に思えて）気が引ける。自分に気恥ずかしさを覚える。", "恥ずかしい。"],
+    examples: [
+      { text: "いと、ここななく田舎びたらむものを、はずかしくおぼえし。", translation: "[気が引ける]ようだなあと、恥ずかしく思った。", blankTarget: "気が引ける" },
+      { text: "こちらが気がひけるほど立派だ。すぐれている。", translation: "こちらが気がひけるほど[立派だ]、すぐれている。", blankTarget: "立派だ" }
+    ]
+  },
+  {
+    id: 18,
+    word: "あさまし",
+    kanji: "驚し",
+    partOfSpeech: "形・シク",
+    meanings: ["驚くほどだ。すばらしい。", "呆れるほどだ。ひどい。もってのほかだ。", "意想外だ。思いがけない。", "（あきれるほど）情けない。嘆かわしい。"],
+    examples: [
+      { text: "なほあさましきあまりに、歌も詠まれあへず。", translation: "なお[驚きあきれるあまり]に、歌も詠まれあへず。", blankTarget: "驚きあきれるあまり" },
+      { text: "あなあさまし。あの花どもはいちぶちいめぞ。", translation: "なんと[驚きあきれるほどだ]。あの花たちは一風変っている。", blankTarget: "驚きあきれるほどだ" }
+    ]
+  },
+  {
+    id: 19,
+    word: "ここち",
+    kanji: "心地",
+    partOfSpeech: "名",
+    meanings: ["病気。体調不良。", "気持ち。気分。感触。感じ。"],
+    examples: [
+      { text: "私的心（れんこん心）病気１、病気。気分がすぐれないこと。", translation: "私的心の[病気]。気分がすぐれないこと。", blankTarget: "病気" }
+    ]
+  },
+  {
+    id: 20,
+    word: "わびし",
+    kanji: "侘びし",
+    partOfSpeech: "形・シク",
+    meanings: ["やりきれない。困る。つらい。", "寂しい。心細い。", "貧しい。落ちぶれる。つまらない。"],
+    examples: [
+      { text: "身のおぼしければをかし、命を生かむとて、命を生かむとて命をも取るを覚すものである。", translation: "身の[思いどおりにならない]、命を生かそうと思って、命をも取るを思ふ。", blankTarget: "思いどおりにならない" }
     ]
   }
 ];
@@ -586,12 +694,10 @@ function startQuiz(isReview = false) {
   let targetWords = [];
 
   if (isReview) {
-    // 間違えた単語のみから復習
     targetWords = wordsData.filter(w => lastWrongWordIds.includes(w.id));
   } else {
-    // 設定範囲から抽出
-    const start = parseInt(document.getElementById('rangeStart').value) || 1;
-    const end = parseInt(document.getElementById('rangeEnd').value) || 10;
+    const start = parseInt(document.getElementById('rangeStart').value) || 11;
+    const end = parseInt(document.getElementById('rangeEnd').value) || 20;
     const count = parseInt(document.getElementById('questionCount').value) || 10;
 
     let filtered = wordsData.filter(w => w.id >= start && w.id <= end);
@@ -641,7 +747,6 @@ function startQuiz(isReview = false) {
   currentIndex = 0;
   quizHistory = [];
 
-  // UI切り替え
   document.getElementById('setupScreen').style.display = 'none';
   document.getElementById('resultScreen').style.display = 'none';
   document.getElementById('quizScreen').style.display = 'block';
@@ -719,33 +824,42 @@ function submitWriteAnswer() {
   checkAnswer(isCorrect, userInput);
 }
 
+// 判定ロジック（同じ単語の別の意味を入力した場合は誤答とする）
 function validateWritingAnswer(userInput, q, level) {
   const normalize = (str) => str.replace(/[\s、。・！!？?「」『』（）()\n\t-]/g, '').toLowerCase();
   const normUser = normalize(userInput);
-  const targetList = q.isExample ? [q.correctAnswer] : q.allMeanings;
+  const normTarget = normalize(q.correctAnswer);
 
   if (!normUser) return false;
 
-  for (let target of targetList) {
-    const normTarget = normalize(target);
-    if (level === 'strict') {
-      if (normUser === normTarget) return true;
-    } else if (level === 'standard') {
-      if (normUser === normTarget || (normTarget.includes(normUser) && normUser.length >= 2) || normUser.includes(normTarget)) return true;
-    } else if (level === 'lenient') {
-      if (normUser === normTarget || normTarget.includes(normUser) || normUser.includes(normTarget)) return true;
-      for (let char of normUser) {
-        if (normTarget.includes(char)) return true;
-      }
+  // 1. 同一単語の「別の意味」リスト
+  const otherMeanings = q.allMeanings.filter(m => normalize(m) !== normTarget);
+
+  // 2. 別の意味に該当する場合は誤答
+  for (let other of otherMeanings) {
+    const normOther = normalize(other);
+    if (normUser === normOther || (normUser.length >= 2 && normOther.includes(normUser) && !normTarget.includes(normUser))) {
+      return false;
     }
   }
+
+  // 3. 正解に対する判定
+  if (level === 'strict') {
+    return normUser === normTarget;
+  } else if (level === 'standard') {
+    if (normUser === normTarget) return true;
+    if (normUser.length >= 2 && (normTarget.includes(normUser) || normUser.includes(normTarget))) return true;
+  } else if (level === 'lenient') {
+    if (normUser === normTarget) return true;
+    if (normTarget.includes(normUser) || normUser.includes(normTarget)) return true;
+  }
+
   return false;
 }
 
 function checkAnswer(isCorrect, userAnsText) {
   const q = currentQuestions[currentIndex];
 
-  // 記録の保存
   quizHistory.push({
     question: q,
     userAnswer: userAnsText,
@@ -775,7 +889,6 @@ function nextQuestion() {
   showQuestion();
 }
 
-// 最終結果の表示
 function showResults() {
   document.getElementById('quizScreen').style.display = 'none';
   document.getElementById('resultScreen').style.display = 'block';
@@ -786,7 +899,6 @@ function showResults() {
 
   document.getElementById('resultScoreText').innerText = `${totalCount} 問中 ${correctCount} 問正解 (${percentage}%)`;
 
-  // 間違えた単語IDの一覧を保持
   lastWrongWordIds = [...new Set(quizHistory.filter(h => !h.isCorrect).map(h => h.question.id))];
 
   const reviewBtn = document.getElementById('reviewBtn');
@@ -797,7 +909,6 @@ function showResults() {
     reviewBtn.style.display = 'none';
   }
 
-  // 詳細リスト描画
   const listContainer = document.getElementById('resultList');
   listContainer.innerHTML = '';
 
@@ -822,7 +933,6 @@ function showResults() {
   });
 }
 
-// キーボードEnterイベント
 document.getElementById('writeInput').addEventListener('keypress', function (e) {
   if (e.key === 'Enter') {
     submitWriteAnswer();
